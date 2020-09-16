@@ -7,9 +7,15 @@ GAME RULES:
 - The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
 - The first player to reach 100 points on GLOBAL score wins the game
 
+3 extra challenges
+
+1. A player looses his ENTIRE score when he rolls two 6 in a row. After that it's the next player's turn.
+2. Add an input field to the HTML where players can set the winning score, so they can change the predefined
+score of 100. 
+3. Add another dice to the game so that there are two dices now. The player looses his current score if one of them is a 1.
 */
 
-var scores, roundScore, activePlayer;
+var scores, roundScore, activePlayer, previousRoll, dice;
 newGame();
 
 document.querySelector('.btn-roll').addEventListener('click', function() {
@@ -24,14 +30,21 @@ document.querySelector('.btn-roll').addEventListener('click', function() {
     
     // 3. update the round score if the rolled number was NOT 1
     if (dice !== 1) {
+        // Check for two sixes in a row
+        if (dice == 6 && previousRoll[activePlayer] == 6) {
+            scores[activePlayer] = 0;
+            document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+            nextPlayer();
+        } else {
         // add score
         roundScore += dice;
+        previousRoll[activePlayer] = dice;
+        console.log(previousRoll[activePlayer]);
         document.querySelector('#current-' + activePlayer).textContent = roundScore;
-    } else {
+    }} else {
         // change the player
         nextPlayer();
-    }
-
+    }   
 });
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
@@ -54,9 +67,11 @@ document.querySelector('.btn-hold').addEventListener('click', function() {
 document.querySelector('.btn-new').addEventListener('click', newGame);
 
 function nextPlayer() {
+    previousRoll[activePlayer] = dice;
+    console.log(previousRoll[activePlayer]);
     activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
         roundScore = 0;
-
+        
         document.getElementById('current-0').textContent = 0;
         document.getElementById('current-1').textContent = 0;
 
@@ -71,6 +86,7 @@ function newGame() {
      scores = [0,0];
      roundScore = 0;
      activePlayer = 0;
+     previousRoll = [0,0];
      // Show controls & hide the dice
      document.querySelector('.btn-roll').style.display = 'block';
      document.querySelector('.btn-hold').style.display = 'block';
